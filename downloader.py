@@ -36,8 +36,5 @@ class Downloader():
             todo = title+'.mp4'
             cmd = f'ffmpeg -i {full_path.joinpath(video)} -i {full_path.joinpath(audio)} -c:v copy -c:a aac {full_path.joinpath(todo)}'
             os.system(cmd)
-
-
-'''folder = pathlib.Path().absolute().joinpath('descargas')
-downloader = Downloader(folder)
-downloader.download('https://youtu.be/qj8FqXsB3Ks', False, quality="480p")'''
+            cmd = f'del /f {full_path.joinpath(audio)} {full_path.joinpath(video)}'
+            os.system(cmd)

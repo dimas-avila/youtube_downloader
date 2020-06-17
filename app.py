@@ -1,19 +1,22 @@
 import downloader
 import tkinter as tk
+from tkinter import filedialog
 import pathlib
+import os
 
 
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.geometry("500x250") 
+        self.master.geometry("500x250")
         self.grid()
         self.row = 0
         self.quality = tk.StringVar(self, value="480p")
         self.isAudio = tk.BooleanVar(self)
+        self.descargador = downloader.Downloader(
+            pathlib.Path().absolute().joinpath('descargas'))
         self.create_widgets()
-        
 
     def create_widgets(self):
         self.link_label = tk.Label(self)
@@ -25,35 +28,48 @@ class Application(tk.Frame):
         media = {"Solo Audio": True, "Audio y Vídeo": False}
         qualities = ["480p", "720p", "1080p"]
 
-        tk.Label(self, text="¿Quieres solo Audio o Vídeo+Audio?").grid(row=self.row, column=0)
+        tk.Label(
+            self, text="¿Quieres solo Audio o Vídeo+Audio?").grid(row=self.row, column=0)
         self.updaterow()
 
         for (text, value) in media.items():
-            tk.Radiobutton(self, text=text, value=value, variable=self.isAudio).grid(row=self.row, column=0)
+            tk.Radiobutton(self, text=text, value=value,
+                           variable=self.isAudio).grid(row=self.row, column=0)
             self.updaterow()
 
-        tk.Label(self, text="¿Qué calidad deseas?").grid(row=self.row, column=0)
+        tk.Label(self, text="¿Qué calidad deseas?").grid(
+            row=self.row, column=0)
         self.updaterow()
 
-        for quality in qualities: 
-            tk.Radiobutton(self, text=quality, value=quality, variable=self.quality).grid(row=self.row, column=0)
+        for quality in qualities:
+            tk.Radiobutton(self, text=quality, value=quality,
+                           variable=self.quality).grid(row=self.row, column=0)
             self.updaterow()
-        
+
         self.descarga = tk.Button(self)
         self.descarga["text"] = "Descargar"
         self.descarga["command"] = self.descargar
         self.descarga.grid(row=self.row, column=0)
 
-    def say_hi(self):
-        print("hi there, everyone!")
+        self.abrir = tk.Button(self)
+        self.abrir["text"] = "Abrir"
+        self.abrir["command"] = self.abrir_fichero
+        self.abrir.grid(row=self.row, column=2)
+
+    def abrir_fichero(self):
+        file_path = tk.filedialog.askopenfilename(
+            initialdir=pathlib.Path().absolute().joinpath('descargas'))
+        os.system(f'start {file_path}')
 
     def updaterow(self):
-        self.row +=1
+        self.row += 1
 
     def descargar(self):
-        print(f'El link del vídeo es: {self.link_entry.get()} y la calidad {self.quality.get()}')
-        descargador = downloader.Downloader(pathlib.Path().absolute().joinpath('descargas'))
-        descargador.download(self.link_entry.get(), self.isAudio.get(), quality=self.quality.get())
+        print(
+            f'El link del vídeo es: {self.link_entry.get()} y la calidad {self.quality.get()}')
+        self.descargador.download(self.link_entry.get(
+        ), self.isAudio.get(), quality=self.quality.get())
+
 
 root = tk.Tk()
 app = Application(master=root)
